@@ -29,6 +29,7 @@
 \usepackage{amsmath,amsfonts,graphicx,amsthm,amssymb}
 \usepackage{hyperref}
 \usepackage[ruled,vlined]{algorithm2e}
+\usepackage{cancel}
 
 \hypersetup{
     colorlinks=true,
@@ -118,6 +119,16 @@
 % **** IF YOU WANT TO DEFINE ADDITIONAL MACROS FOR YOURSELF, PUT THEM HERE:
 
 \newcommand\E{\mathbb{E}}
+\newtheorem{problem}{Problem}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\newenvironment{subproof}[1][\proofname]{%
+  \renewcommand{\qedsymbol}{$\blacksquare$}%
+  \begin{proof}[#1]%
+}{%
+  \end{proof}%
+}
+\allowdisplaybreaks
+
 
 \begin{document}
 %FILL IN THE RIGHT INFO.
@@ -264,10 +275,24 @@ This requires us to maximize a monotone submodular function. The
 greedy algorithm selects the element with the largest discrete
 derivative at iteration $i$.
 
+
+%----------------------------------------------------------------------------------------
+%----------------------------------------------------------------------------------------
+
 \section{Approx. Submodular Function Maximization}
 
+
 It is well known that maximizing an arbitrary submodular function with
-given constraint set is NP-Hard. %(REFERENCE?)
+given constraint set is, in general, NP-Hard. %(REFERENCE?)
+
+\begin{problem}
+Given ground set $S_g$, subset $S \subseteq S_g$, and submodular set function $f(\cdot)$:
+
+$\displaystyle \max_{S \, \subseteq \, S_g} f(S)$
+
+$\text{subject to}$ $|S| \leq k$
+
+\end{problem}
 
 %To reiterate, there are a number of well known problems which reduce to submodular maximization (UNNECESSARY?):
 %
@@ -282,30 +307,93 @@ Finding the optimal solution may be intractable; however, an approximate solutio
 
 \begin{algorithm}[H]
 \SetAlgoLined
-\SetKw{Kw}{Description}
 \caption{Greedy Algorithm}
-\Kw{ blah blah blah}\;
-\KwResult{Write here the result }
- initialization\;
- \While{While condition}{
-  instructions\;
-  \eIf{condition}{
-   instructions1\;
-   instructions2\;
-   }{
-   instructions3\;
-  }
+\SetKw{Kw}{Define}
+\Kw{ground set $S_g$, subset $S \subseteq S_g$, set function $f(\cdot)$, and cardinality constraint $|S| \leq k$  }\;
+\SetKw{Kw}{Description}
+\Kw{ greedily add to $S$ at iteration $i$ the element with the largest discrete derivative}\;
+\KwResult{$S_{greedy}$ }
+ $S_0=\emptyset$\;
+ \While{$|S_i| \leq k$}{
+  $\displaystyle S_{i+1} = S_i \, \cup \, \argmax_{s \in \{S_g \diagup S_i\}} \bigg\{ \Delta(s\diagup S_i) \bigg\}$ \;
+%  \eIf{condition}{
+%   instructions1\;
+%   instructions2\;
+%   }{
+%   instructions3\;
+%  }
  }
 
 \end{algorithm}
 
+\newpage
+
 \begin{theorem}
-Let $S^*$ denote the optimal subset , and $S_{greedy}$ as the Greedy Algorithm selection
+Let $S^*$ denote the optimal subset , and $S_{greedy,\ell}$ as the Greedy Algorithm selection after $\ell$ iterations. Given set function $f$ which is submodular, monotone, non-negative, and $f(\emptyset)=0$ :
 
-Given set function $f$ which is submodular, monotone, non-negative, and $f(\emptyset)=0$
+$f(S_{greedy,\ell}) \geq [1-\text{exp}[-\dfrac{\ell}{k}]] \cdot f(S^*)$
+	
+$f(S_{greedy,\ell=k}) \geq [1-\dfrac{1}{e}] \cdot f(S^*) \approx 0.63 \cdot f(S^*)$
 
-$f(S_{greedy}) \geq [1-1/e] \cdot f(S^*) \approx 0.63 \cdot f(S^*)$
 \end{theorem}
+
+\begin{proof}
+(Nemhauser and Wolsey) \footnote{see Nemhauser \& Wolsey survey:
+  \href{http://www.cs.toronto.edu/~eidan/papers/submod-max.pdf}{http://www.cs.toronto.edu/~eidan/papers/submod-max.pdf}}
+
+Let $S_i$ denote the Greedy algorithm selection after the $i$-th iteration
+
+$f(S^*) \leq f(S^* \cup S_i)$ $\text{(monotonicity)}$
+
+\begin{claim}
+$\displaystyle f(S^* \cup S_i) = f(S_i) + \sum_{j=1}^{k} \Delta \bigg(v_j^* \diagup \big\{S_i \cup \{v_1^*,v_2^*,\ldots,v_{j-1}^*\}\big\}\bigg)$
+
+\begin{subproof}[Subproof]
+Expand:
+%%%%
+\begin{flalign*}
+\displaystyle f(S^* \cup S_i) &= f(S_i) + \Delta \big(v_1^* \diagup S_i \big)
++\Delta \bigg(v_2^* \diagup \big\{S_i \cup v_1^*\big\}\bigg) 
++\cdots 
++\Delta \bigg(v_k^* \diagup \big\{S_i \cup \{v_1^*,v_2^*,\ldots,v_{k-1}^*\}\big\}\bigg) &\\
+%%%%
+&= \cancel{f(S_i)} + \cancel{{f(S_i \cup v_1^*)}} - \cancel{{f(S_i)}}
++ \cdots + f(S_i \cup \{v_1^*,v_2^*,\ldots,v_{k}^*\}) 
+-\cancel{f(S_i \cup \{v_1^*,v_2^*,\ldots,v_{k-1}^*\})}  &\\
+%%%%
+&= f(S^* \cup S_i)
+\end{flalign*}
+
+The telescoping sum leaves only the desired term.
+
+\end{subproof}
+\end{claim}
+%%%%
+With claim above it follows: %%REFERENCE step 1?
+%%%%
+\begin{flalign*}
+f(S^*) \leq f(S^* \cup S_i) &=  f(S_i) + \sum_{j=1}^{k} \Delta \bigg(v_j^* \diagup \big\{S_i \cup \{v_1^*,v_2^*,\ldots,v_{j-1}^*\}\big\}\bigg) & &\\
+&\leq f(S_i) + \sum_{j=1}^{k} \Delta (v_j^* \diagup S_i) &\text{(by submodularity)} &\\
+&\leq f(S_i) + \sum_{j=1}^{k} [f(S_{i+1})-f(S_i)] & \text{(by Greedy selection)} &\\
+&= f(S_i) +k\cdot[f(S_{i+1})-f(S_i)]&\\
+&\\
+\Rightarrow f(S^*)-f(S_i) &\leq k\cdot[f(S_{i+1})-f(S_i)] &\\
+\delta_i &\leq k\cdot[\delta_i-\delta_{i+1}] &(\delta_i \triangleq f(S^*)-f(S_i)) &\\
+\delta_{i+1} &\leq (1-\dfrac{1}{k})\cdot\delta_i &\\
+\delta_\ell &\leq (1-\dfrac{1}{k})^\ell\cdot\delta_0 &\\
+&\\
+f(S_\ell) &\geq (1-(1-\dfrac{1}{k})^\ell)\cdot f(S^*) 
+&(\delta_0 = f(S^*)-f(\emptyset)=f(S^*) &\\
+f(S_\ell) &\geq (1-\text{exp}(-\dfrac{\ell}{k}))\cdot f(S^*)
+&(1-x \leq \text{exp}^{-x} \,\, \forall \, x) &\\
+\end{flalign*}
+\end{proof}
+
+
+
+%----------------------------------------------------------------------------------------
+%----------------------------------------------------------------------------------------
+
 
 
 
