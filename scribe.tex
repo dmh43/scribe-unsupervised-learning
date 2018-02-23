@@ -99,6 +99,7 @@
 
 %Use this command for a figure; it puts a figure in wherever you want it.
 %usage: \fig{NUMBER}{SPACE-IN-INCHES}{CAPTION}
+\newcommand{\indep}{\rotatebox[origin=c]{90}{$\models$}}
 \newcommand{\fig}[3]{
 			\vspace{#2}
 			\begin{center}
@@ -108,12 +109,12 @@
 % Use these for theorems, lemmas, proofs, etc.
 \theoremstyle{definition}
 \newtheorem{theorem}{Theorem}[lecnum]
-\newtheorem{example}{Example}
+\newtheorem{example}[theorem]{Example}
 \newtheorem{lemma}[theorem]{Lemma}
 \newtheorem{proposition}[theorem]{Proposition}
 \newtheorem{claim}[theorem]{Claim}
 \newtheorem{corollary}[theorem]{Corollary}
-\newtheorem{note}{Note}
+\newtheorem{note}[theorem]{Note}
 \newtheorem{definition}[theorem]{Definition}
 
 % **** IF YOU WANT TO DEFINE ADDITIONAL MACROS FOR YOURSELF, PUT THEM HERE:
@@ -193,11 +194,10 @@ $f_H$ is submodular.
 %   $2^{H(X)}$ is the volume of the support set of $X$.
 % \end{note}
 
-In the discrete case we can show that $f_H$ is also monotone. Howevers,
+In the discrete case we can show that $f_H$ is also monotone. However,
 in the continuous case, this function is no longer
-monotone.\footnote{see Krause \& Golovia survey:
+monotone, in general.\footnote{see Krause \& Golovia survey:
   \href{https://las.inf.ethz.ch/files/krause12survey.pdf}{https://las.inf.ethz.ch/files/krause12survey.pdf}}
-(TODO: counterexample).
 
 \begin{example}
   Consider $X_1, ..., X_n$ jointly gaussian random variables with pdf:
@@ -207,11 +207,34 @@ monotone.\footnote{see Krause \& Golovia survey:
   The differential entropy of a subset indexed by $S$ is given by:
   $$H(X_S) = \frac{1}{2} 2 \pi e\log \det \Sigma_s$$
   Where $\Sigma_S$ denotes the submatrix of the covariance matrix
-  $\Sigma$ formed by taking only the variables indexed by $S$. So to
-  choose the subset of $k$ variables with the largest entropy, we must
-  maximize the determinant of $\Sigma_S$.
+  $\Sigma$ formed by taking only the variables indexed by $S$.
+
+  Consider the covariance matrix:
+
+  \begin{align}
+    \Sigma =
+    \begin{bmatrix}
+               1 & 0 & 0 & 0 \\
+               0 & 2 & 0 & 0 \\
+               0 & 0 & 0.1 & 0 \\
+               0 & 0 & 0 & 3  \notag
+             \end{bmatrix}
+  \end{align}
+
+  \begin{align*}
+    & \det(\Sigma_{\{0\}}) = 1\\
+    & \det(\Sigma_{\{0, 1\}}) = 2\\
+    & \det(\Sigma_{\{0, 1, 2\}}) = 0.2\\
+    & \det(\Sigma_{\{0, 1, 2, 3\}}) = 0.6
+  \end{align*}
+  So $H(X_\mathcal{X})$ is not monotone in this case.
   \QEDB
 \end{example}
+
+\begin{note}
+  In the above example, to choose the subset of $k$ variables with the
+  largest entropy, we must maximize the determinant of $\Sigma_S$.
+\end{note}
 
 \begin{proposition}
   Mutual information is, in general, not submodular.
@@ -231,22 +254,24 @@ monotone.\footnote{see Krause \& Golovia survey:
 \end{claim}
 
 \begin{proposition}
-  TODO: fix this proof
   Given sets $S$ and $U$ of random variables such that the elements of
-  $S$ are independent of each other conditioned on $X_U$, then $f_I(A) = I(U;
+  $S$ are independent of each other conditioned on $U$, then $f_I(A) = I(U;
   A)$
   is submodular for all $A \subseteq S \cup U$.
 \end{proposition}
 
 \begin{proof}
-  Let $W = U \cup S$ and $C = A \cup B$ such that $A, B \subseteq W$. So:
-  \begin{align*}
-    H (U | C) &= H (U |A \cup B) \\
-              &= H (U \cup A) - H(A \cup B) \\
-              &= H (A|U)+ H (U) - H (C) \\
-              &= H (U) - H (C) + \sum_{Y \in C \cap S} H (Y |U)
-  \end{align*}
-  Where the last step follows using the chain rule for the joint entropy. H (U) is constant, H (C) is submodular and ∑ Y ∈C∩S H (Y | U) is linear in C on U ∪S and hence on W .
+  Let $A \subseteq S \cup U$ and $S_1 \indep S_2$ conditioned on
+  $U$ $ \forall S_1, S_2 \subseteq S$.
+  \begin{align} \label{eq:1}
+    I(U; C) &= H(U) - H(U | C) \nonumber\\
+            &= H(U) - (H(U \cup C) - H(C)) \nonumber\\
+            &= H(U) - (H(C | U) + H(U) - H(C)) \nonumber\\
+            &= -\sum_{y \in C \cap S} H(y | U) + H(C)
+  \end{align}
+  Where the last step follows by conditional independence the elements
+  of $S$ conditioned on $U$. The first term in equation \ref{eq:1} is
+  modular in $C$ and the second is submodular.
 \end{proof}
 
 \begin{figure}[h]
@@ -288,9 +313,12 @@ given constraint set is, in general, NP-Hard. %(REFERENCE?)
 \begin{problem}
 Given ground set $S_g$, subset $S \subseteq S_g$, and submodular set function $f(\cdot)$:
 
-$\displaystyle \max_{S \, \subseteq \, S_g} f(S)$
-
-$\text{subject to}$ $|S| \leq k$
+\begin{equation*}
+  \begin{split}
+    \max_{S \, \subseteq \, S_g} &f(S)\\
+    \text{subject to } &|S| \leq k
+  \end{split}
+\end{equation*}
 
 \end{problem}
 
@@ -325,8 +353,6 @@ Finding the optimal solution may be intractable; however, an approximate solutio
  }
 
 \end{algorithm}
-
-\newpage
 
 \begin{theorem}
 Let $S^*$ denote the optimal subset , and $S_{greedy,\ell}$ as the Greedy Algorithm selection after $\ell$ iterations. Given set function $f$ which is submodular, monotone, non-negative, and $f(\emptyset)=0$ :
@@ -388,82 +414,6 @@ f(S_\ell) &\geq (1-\text{exp}(-\dfrac{\ell}{k}))\cdot f(S^*)
 &(1-x \leq \text{exp}^{-x} \,\, \forall \, x) &\\
 \end{flalign*}
 \end{proof}
-
-
-
-%----------------------------------------------------------------------------------------
-%----------------------------------------------------------------------------------------
-
-
-
-
-\subsection{latex reference}
-
-Here is an itemized list:
-\begin{itemize}
-\item this is the first item;
-\item this is the second item.
-\end{itemize}
-
-Here is an enumerated list:
-\begin{enumerate}
-\item this is the first item;
-\item this is the second item.
-\end{enumerate}
-
-Here is an exercise:
-
-{\bf Exercise:}  Show that ${\rm P}\ne{\rm NP}$.
-
-Here is how to define things in the proper mathematical style.
-Let $f_k$ be the $AND-OR$ function, defined by
-
-\[ f_k(x_1, x_2, \ldots, x_{2^k}) = \left\{ \begin{array}{ll}
-
-	x_1 & \mbox{if $k = 0$;} \\
-
-	AND(f_{k-1}(x_1, \ldots, x_{2^{k-1}}),
-	   f_{k-1}(x_{2^{k-1} + 1}, \ldots, x_{2^k}))
-	 & \mbox{if $k$ is even;} \\
-
-	OR(f_{k-1}(x_1, \ldots, x_{2^{k-1}}),
-	   f_{k-1}(x_{2^{k-1} + 1}, \ldots, x_{2^k}))
-	& \mbox{otherwise.}
-	\end{array}
-	\right. \]
-
-\begin{theorem}
-This is the first theorem.
-\end{theorem}
-
-\begin{proof}
-This is the proof of the first theorem. We show how to write pseudo-code now.
-%*** USE PSEUDO-CODE ONLY IF IT IS CLEARER THAN AN ENGLISH DESCRIPTION
-
-Consider a comparison between $x$ and~$y$:
-\begin{tabbing}
-\hspace*{.25in} \= \hspace*{.25in} \= \hspace*{.25in} \= \hspace*{.25in} \= \hspace*{.25in} \=\kill
-\>{\bf if} $x$ or $y$ or both are in $S$ {\bf then } \\
-\>\> answer accordingly \\
-\>{\bf else} \\
-\>\>    Make the element with the larger score (say $x$) win the comparison \\
-\>\> {\bf if} $F(x) + F(y) < \frac{n}{t-1}$ {\bf then} \\%
-\>\>\> $F(x) \leftarrow F(x) + F(y)$ \\
-\>\>\> $F(y) \leftarrow 0$ \\
-\>\> {\bf else}  \\
-\>\>\> $S \leftarrow S \cup \{ x \} $ \\
-\>\>\> $r \leftarrow r+1$ \\
-\>\> {\bf endif} \\
-\>{\bf endif}
-\end{tabbing}
-
-This concludes the proof.
-\end{proof}
-
-
-\section{Next topic}
-
-Here is a citation, just for fun~\cite{CW87}.
 
 \section*{References}
 \beginrefs
