@@ -143,9 +143,7 @@
 % macros follow.
 %**** IN GENERAL, BE BRIEF. LONG SCRIBE NOTES, NO MATTER HOW WELL WRITTEN,
 %**** ARE NEVER READ BY ANYBODY.
-This lecture's notes illustrate some uses of
-various \LaTeX\ macros.
-Take a look at this and imitate.
+
 
 \subsubsection*{Topics Covered} % Don't be this informal in your notes!
 \begin{itemize}
@@ -158,7 +156,7 @@ Take a look at this and imitate.
 
 \subsubsection*{Entropy}
 Given a set, $S$, of discrete random variables, define
-the set function $f_H(S): 2^V \mapsto \mathbb{R}$
+the set function $f_H(S): 2^\mathcal{X} \mapsto \mathbb{R}$
 $$f_H(S) = H(X_S) = - \sum_{x_i \in S} p(x_i)\log p(x_i) $$
 and for differential entropy:
 
@@ -166,7 +164,7 @@ $$f_H(S) = H(X_S) = - \int_{\mathcal{X}_S} p(x)\log p(x)dx $$
 
 \subsubsection*{Mutual Information}
 Given random vectors $Y$ and $X_S$, define the following as the mutual
-information between them $f_I(S):~2^V~\mapsto~\mathbb{R}$
+information between them $f_I(S):~2^\mathcal{X}~\mapsto~\mathbb{R}$
 $$f_I(S) = I(Y; X_S) = H(Y) - H(Y | X_S)$$
 
 \section{Properties}
@@ -179,14 +177,14 @@ $f_H$ is submodular.
   Consider subsets $A$ and $B$ of random variables,
   $\mathcal{X}$, where $A \subseteq B$. Also consider a random
   variable $X_m \notin A \cup B$
-  $$f_H(A \cup \{m\}) - f_H(X_A) = H(X_A, X_m) - H(X_A) = H(X_m | X_A)$$
+  $$f_H(X_A , X_{\{m\}}) - f_H(X_A) = H(X_A, X_m) - H(X_A) = H(X_m | X_A)$$
   \centering and similarly
-  $$f_H(B \cup \{m\}) - f_H(X_B) = H(X_m | X_B)$$
+  $$f_H(X_B , X_{\{m\}}) - f_H(X_B) = H(X_m | X_B)$$
   Since conditioning on a larger set of random variables cannot
   increase the entropy:
   \begin{align*}
     H(X_m | X_B) & \leq H(X_m | X_A) \\
-    f_H(B \cup \{m\}) - f_H(X_B) & \leq f_H(A \cup \{m\}) - f_H(X_A)
+    f_H(X_B , X_{\{m\}}) - f_H(X_B) & \leq f_H(X_A , X_{\{m\}}) - f_H(X_A)
   \end{align*}
 \end{proof}
 
@@ -196,12 +194,11 @@ $f_H$ is submodular.
 
 In the discrete case we can show that $f_H$ is also monotone. However,
 in the continuous case, this function is no longer
-monotone, in general.\footnote{see Krause \& Golovia survey:
-  \href{https://las.inf.ethz.ch/files/krause12survey.pdf}{https://las.inf.ethz.ch/files/krause12survey.pdf}}
+monotone, in general\cite{KG14}.
 
 \begin{example}
   Consider $X_1, ..., X_n$ jointly gaussian random variables with pdf:
-  $$p(x) = \frac{1}{\sqrt{2\pi |\Sigma|}} e^{-\frac{1}{2}(x-\mu)^T
+  $$p(x) = \frac{1}{\sqrt{2\pi \det \Sigma}} e^{-\frac{1}{2}(x-\mu)^T
     \Sigma^{-1} (x-\mu)}$$
 
   The differential entropy of a subset indexed by $S$ is given by:
@@ -240,12 +237,17 @@ monotone, in general.\footnote{see Krause \& Golovia survey:
   Mutual information is, in general, not submodular.
 \end{proposition}
 \begin{proof}
-  Consider $X$, $Y$
-  independent $Bernoulli(\frac{1}{2})$ random variables. Let $Z = X
-  \xor Y$. So:
+  Recall the set function for mutual information as defined earlier, $f_I(S) = I(Y; X_S)$
 
-  $$H(Z) = H (Z | X) = H (Z | Y) = 1  \text{ and } H (Z | X \cup Y) = 0$$
-  $$\implies H(Z) - H(Z | X) \leq H (Z | Y) - H (Z | X \cup Y)$$
+  Consider $X_1$, $X_2$
+  independent $Bernoulli(\frac{1}{2})$ random variables. Let $Y = X_1
+  \xor X_2$. So:
+  \begin{align*}
+    H(Y) &= H (Y | X_1) = H (Y | X_2) = 1  \text{ and } H (Y | X_1,
+           X_2) = 0 \\
+         & \implies H(Y) - H(Y | X_1) \leq H (Y) - H (Y | X_1, X_2) \\
+         & \implies f_I(\{1\} | \emptyset) < f_I(\{1\} | \{2\})
+  \end{align*}
 \end{proof}
 
 \begin{claim}
@@ -264,30 +266,37 @@ monotone, in general.\footnote{see Krause \& Golovia survey:
   Let $A \subseteq S \cup U$ and $S_1 \indep S_2$ conditioned on
   $U$ $ \forall S_1, S_2 \subseteq S$.
   \begin{align} \label{eq:1}
-    I(U; C) &= H(U) - H(U | C) \nonumber\\
-            &= H(U) - (H(U \cup C) - H(C)) \nonumber\\
-            &= H(U) - (H(C | U) + H(U) - H(C)) \nonumber\\
-            &= -\sum_{y \in C \cap S} H(y | U) + H(C)
+    I(U; A) &= H(U) - H(U | A) \nonumber\\
+            &= H(U) - (H(U \cup A) - H(A)) \nonumber\\
+            &= H(U) - (H(A | U) + H(U) - H(A)) \nonumber\\
+            &= -\sum_{y \in A \cap S} H(y | U) + H(A)
   \end{align}
   Where the last step follows by conditional independence the elements
   of $S$ conditioned on $U$. The first term in equation \ref{eq:1} is
-  modular in $C$ and the second is submodular.
+  modular in $A$ and the second is submodular.
 \end{proof}
 
 \begin{figure}[h]
   \centering
   \includegraphics[scale=0.8]{cond_ind.png}
-  \caption{An undirected graphical model where the elemets of $S$ are
+  \caption{An directed graphical model where the elemets of $S$ are
     independent conditioned on $U$}
   \label{fig:ugm}
 \end{figure}
 
-This claim holds if the distribution factorizes according to an
-undirected graphical model similar to \ref{fig:ugm}. Recall the conditional
-independence properties we can infer from an undirected graphical
-model.
+This claim holds if the distribution factorizes according to a
+graphical model similar to \ref{fig:ugm}. Recall the conditional
+independence properties we can infer from directed and undirected graphical
+models.
 
 \section{Optimization}
+The sensor selection problem addressed in \cite{KG05-1} is framed as
+a joint entropy maximization problem. Intuitively, we can think of this
+problem equivalently as minimizing the uncertainty of the sensors that
+are not selected (since they will not be observed). One might suggest
+a PCA type solution to this problem, but unfortunately, these are
+physical sensors that we are selecting, so we cannot take a linear
+combination of them! Gram-–Schmidt will not save you here!
 
 Consider the chain rule of entropy:
 $$H(X_1, ..., X_n) = H(X_S) + H(X_{S^c} | X_S)$$
@@ -303,7 +312,7 @@ derivative at iteration $i$.
 
 %----------------------------------------------------------------------------------------
 %----------------------------------------------------------------------------------------
-
+\newpage
 \section{Approx. Submodular Function Maximization}
 
 
@@ -364,13 +373,14 @@ $f(S_{greedy,\ell=k}) \geq [1-\dfrac{1}{e}] \cdot f(S^*) \approx 0.63 \cdot f(S^
 \end{theorem}
 
 \begin{proof}
-(Nemhauser and Wolsey) \footnote{see Nemhauser \& Wolsey survey:
-  \href{http://www.cs.toronto.edu/~eidan/papers/submod-max.pdf}{http://www.cs.toronto.edu/~eidan/papers/submod-max.pdf}}
+  \cite{NW78}
+
 
 Let $S_i$ denote the Greedy algorithm selection after the $i$-th iteration
 
 $f(S^*) \leq f(S^* \cup S_i)$ $\text{(monotonicity)}$
 
+\newpage
 \begin{claim}
 $\displaystyle f(S^* \cup S_i) = f(S_i) + \sum_{j=1}^{k} \Delta \bigg(v_j^* \diagup \big\{S_i \cup \{v_1^*,v_2^*,\ldots,v_{j-1}^*\}\big\}\bigg)$
 
@@ -411,10 +421,37 @@ f(S^*) \leq f(S^* \cup S_i) &=  f(S_i) + \sum_{j=1}^{k} \Delta \bigg(v_j^* \diag
 f(S_\ell) &\geq (1-(1-\dfrac{1}{k})^\ell)\cdot f(S^*) 
 &(\delta_0 = f(S^*)-f(\emptyset)=f(S^*) &\\
 f(S_\ell) &\geq (1-\text{exp}(-\dfrac{\ell}{k}))\cdot f(S^*)
-&(1-x \leq \text{exp}^{-x} \,\, \forall \, x) &\\
+&(1-x \leq \text{e}^{-x} \,\, \forall \, x) &\\
 \end{flalign*}
 \end{proof}
 
+\newpage
+
+\section{Next Time: Feature Selection}
+
+The feature selection problem given by:
+\begin{equation*}
+  \begin{split}
+    \max_{\beta} &||X\beta - y||_2^2\\
+    \text{subject to } & ||\beta||_0 \leq k
+  \end{split}
+\end{equation*}
+can be relaxed by changing the $\ell_0$ norm for an $\ell_1$
+norm. Bringing the constraint into the objective and setting $\lambda$
+as a hyperparameter, we arrive at the LASSO problem:
+
+\begin{equation*}
+  \begin{split}
+    \max_{\beta} &||X\beta - y||_2^2 + \lambda ||\beta||_1\\
+  \end{split}
+\end{equation*}
+
+Alternatively, we can frame the objective as a set function
+$f(S) = ||X_S\beta_S||_2^2$ and show that if the columns of $X$ are
+orthogonal, then $f$ is submodular. Otherwise, $f$ is weakly submodular
+if $X$ satisfies the restricted isometry property (RIP).
+
+\newpage
 \section*{References}
 \beginrefs
 \bibentry{KG05-1}{\sc Krause, Andreas and Guestrin, Carlos},
@@ -424,7 +461,15 @@ f(S_\ell) &\geq (1-\text{exp}(-\dfrac{\ell}{k}))\cdot f(S^*)
 
 \bibentry{KG05-2}{\sc Krause, Andreas and Guestrin, Carlos},
 ``Near-optimal Nonmyopic Value of Information in Graphical Models,''
-{\it Proceedings of the Twenty-First Conference on Uncertainty in Artificial Intelligence}, 2005.
+{\it Proceedings of the Twenty-First Conference on Uncertainty in
+  Artificial Intelligence}, 2005.
+
+\bibentry{KG14}{\sc Krause, Andreas, and Daniel Golovin},
+``Submodular function maximization,'' 2014.
+
+\bibentry{NW78}{\sc Nemhauser, George L., Laurence A. Wolsey, and Marshall L. Fisher},
+``An analysis of approximations for maximizing submodular set functions,''
+{\it Mathematical Programming}, 1978.
 \endrefs
 
 % **** THIS ENDS THE EXAMPLES. DON'T DELETE THE FOLLOWING LINE:
