@@ -352,7 +352,7 @@ Finding the optimal solution may be intractable; however, an approximate solutio
 \KwResult{$S_{greedy}$ }
  $S_0=\emptyset$\;
  \While{$|S_i| \leq k$}{
-  $\displaystyle S_{i+1} = S_i \, \cup \, \argmax_{s \in \{S_g \diagup S_i\}} \bigg\{ \Delta(s\diagup S_i) \bigg\}$ \;
+  $\displaystyle S_{i+1} = S_i \, \cup \, \argmax_{s \in \{S_g \setminus S_i\}} \bigg\{ \Delta(s\setminus S_i) \bigg\}$ \;
 %  \eIf{condition}{
 %   instructions1\;
 %   instructions2\;
@@ -382,16 +382,16 @@ $f(S^*) \leq f(S^* \cup S_i)$ $\text{(monotonicity)}$
 
 \newpage
 \begin{claim}
-$\displaystyle f(S^* \cup S_i) = f(S_i) + \sum_{j=1}^{k} \Delta \bigg(v_j^* \diagup \big\{S_i \cup \{v_1^*,v_2^*,\ldots,v_{j-1}^*\}\big\}\bigg)$
+$\displaystyle f(S^* \cup S_i) = f(S_i) + \sum_{j=1}^{k} \Delta \bigg(v_j^* \setminus \big\{S_i \cup \{v_1^*,v_2^*,\ldots,v_{j-1}^*\}\big\}\bigg)$
 
 \begin{subproof}[Subproof]
 Expand:
 %%%%
 \begin{flalign*}
-\displaystyle f(S^* \cup S_i) &= f(S_i) + \Delta \big(v_1^* \diagup S_i \big)
-+\Delta \bigg(v_2^* \diagup \big\{S_i \cup v_1^*\big\}\bigg) 
+\displaystyle f(S^* \cup S_i) &= f(S_i) + \Delta \big(v_1^* \setminus S_i \big)
++\Delta \bigg(v_2^* \setminus \big\{S_i \cup v_1^*\big\}\bigg)
 +\cdots 
-+\Delta \bigg(v_k^* \diagup \big\{S_i \cup \{v_1^*,v_2^*,\ldots,v_{k-1}^*\}\big\}\bigg) &\\
++\Delta \bigg(v_k^* \setminus\big\{S_i \cup \{v_1^*,v_2^*,\ldots,v_{k-1}^*\}\big\}\bigg) &\\
 %%%%
 &= \cancel{f(S_i)} + \cancel{{f(S_i \cup v_1^*)}} - \cancel{{f(S_i)}}
 + \cdots + f(S_i \cup \{v_1^*,v_2^*,\ldots,v_{k}^*\}) 
@@ -408,8 +408,8 @@ The telescoping sum leaves only the desired term.
 With claim above it follows: %%REFERENCE step 1?
 %%%%
 \begin{flalign*}
-f(S^*) \leq f(S^* \cup S_i) &=  f(S_i) + \sum_{j=1}^{k} \Delta \bigg(v_j^* \diagup \big\{S_i \cup \{v_1^*,v_2^*,\ldots,v_{j-1}^*\}\big\}\bigg) & &\\
-&\leq f(S_i) + \sum_{j=1}^{k} \Delta (v_j^* \diagup S_i) &\text{(by submodularity)} &\\
+f(S^*) \leq f(S^* \cup S_i) &=  f(S_i) + \sum_{j=1}^{k} \Delta \bigg(v_j^* \setminus \big\{S_i \cup \{v_1^*,v_2^*,\ldots,v_{j-1}^*\}\big\}\bigg) & &\\
+&\leq f(S_i) + \sum_{j=1}^{k} \Delta (v_j^* \setminus S_i) &\text{(by submodularity)} &\\
 &\leq f(S_i) + \sum_{j=1}^{k} [f(S_{i+1})-f(S_i)] & \text{(by Greedy selection)} &\\
 &= f(S_i) +k\cdot[f(S_{i+1})-f(S_i)]&\\
 &\\
