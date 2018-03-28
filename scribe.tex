@@ -340,6 +340,9 @@ Given ground set $S_g$, subset $S \subseteq S_g$, and submodular set function $f
 %\item Knapsack problem
 %\end{itemize}
 
+\newcommand{\spbigvert}{\, \big \vert \,}
+\newcommand{\spvert}{\, \vert \,}
+
 Finding the optimal solution may be intractable; however, an approximate solution known as the Greedy Algorithm can achieve fair results. More specifically:
 
 \begin{algorithm}[H]
@@ -351,17 +354,20 @@ Finding the optimal solution may be intractable; however, an approximate solutio
 \Kw{ greedily add to $S$ at iteration $i$ the element with the largest discrete derivative}\;
 \KwResult{$S_{greedy}$ }
  $S_0=\emptyset$\;
- \While{$|S_i| \leq k$}{
-  $\displaystyle S_{i+1} = S_i \, \cup \, \argmax_{s \in \{S_g \setminus S_i\}} \bigg\{ \Delta(s\setminus S_i) \bigg\}$ \;
-%  \eIf{condition}{
-%   instructions1\;
-%   instructions2\;
-%   }{
-%   instructions3\;
-%  }
+ $i=0$\;
+ \While{$|S_{i}| \leq k-1$}{
+  $\displaystyle S_{i+1} = S_i \, \cup \, \argmax_{s \in \{S_g \setminus S_i\}} \bigg\{ \Delta_f(s \spvert S_i) \bigg\}$ \;
+  $i=i+1$\;
  }
-
+\SetKw{Kw}{Return}
+\Kw{$S_{i+1}$}\;
 \end{algorithm}
+
+\underline{Recall:} For set function $f: 2^V \rightarrow \mathbb{R}, S \subseteq V,$
+and $e \in V$ \\
+let $\Delta_f(e \spvert S) := f(S \cup \{e\}) - f(S)$
+
+
 
 \begin{theorem}
 Let $S^*$ denote the optimal subset , and $S_{greedy,\ell}$ as the Greedy Algorithm selection after $\ell$ iterations. Given set function $f$ which is submodular, monotone, non-negative, and $f(\emptyset)=0$ :
@@ -382,16 +388,16 @@ $f(S^*) \leq f(S^* \cup S_i)$ $\text{(monotonicity)}$
 
 \newpage
 \begin{claim}
-$\displaystyle f(S^* \cup S_i) = f(S_i) + \sum_{j=1}^{k} \Delta \bigg(v_j^* \setminus \big\{S_i \cup \{v_1^*,v_2^*,\ldots,v_{j-1}^*\}\big\}\bigg)$
+$\displaystyle f(S^* \cup S_i) = f(S_i) + \sum_{j=1}^{k} \Delta_f \bigg(v_j^* \spbigvert \big\{S_i \cup \{v_1^*,v_2^*,\ldots,v_{j-1}^*\}\big\}\bigg)$
 
 \begin{subproof}[Subproof]
 Expand:
 %%%%
 \begin{flalign*}
-\displaystyle f(S^* \cup S_i) &= f(S_i) + \Delta \big(v_1^* \setminus S_i \big)
-+\Delta \bigg(v_2^* \setminus \big\{S_i \cup v_1^*\big\}\bigg)
+\displaystyle f(S^* \cup S_i) &= f(S_i) + \Delta_f \big(v_1^* \spbigvert S_i \big)
++\Delta_f \bigg(v_2^* \spbigvert \big\{S_i \cup v_1^*\big\}\bigg)
 +\cdots 
-+\Delta \bigg(v_k^* \setminus\big\{S_i \cup \{v_1^*,v_2^*,\ldots,v_{k-1}^*\}\big\}\bigg) &\\
++\Delta_f \bigg(v_k^* \spbigvert\big\{S_i \cup \{v_1^*,v_2^*,\ldots,v_{k-1}^*\}\big\}\bigg) &\\
 %%%%
 &= \cancel{f(S_i)} + \cancel{{f(S_i \cup v_1^*)}} - \cancel{{f(S_i)}}
 + \cdots + f(S_i \cup \{v_1^*,v_2^*,\ldots,v_{k}^*\}) 
@@ -408,8 +414,8 @@ The telescoping sum leaves only the desired term.
 With claim above it follows: %%REFERENCE step 1?
 %%%%
 \begin{flalign*}
-f(S^*) \leq f(S^* \cup S_i) &=  f(S_i) + \sum_{j=1}^{k} \Delta \bigg(v_j^* \setminus \big\{S_i \cup \{v_1^*,v_2^*,\ldots,v_{j-1}^*\}\big\}\bigg) & &\\
-&\leq f(S_i) + \sum_{j=1}^{k} \Delta (v_j^* \setminus S_i) &\text{(by submodularity)} &\\
+f(S^*) \leq f(S^* \cup S_i) &=  f(S_i) + \sum_{j=1}^{k} \Delta_f \bigg(v_j^* \spbigvert \big\{S_i \cup \{v_1^*,v_2^*,\ldots,v_{j-1}^*\}\big\}\bigg) & &\\
+&\leq f(S_i) + \sum_{j=1}^{k} \Delta_f (v_j^* \spbigvert S_i) &\text{(by submodularity)} &\\
 &\leq f(S_i) + \sum_{j=1}^{k} [f(S_{i+1})-f(S_i)] & \text{(by Greedy selection)} &\\
 &= f(S_i) +k\cdot[f(S_{i+1})-f(S_i)]&\\
 &\\
