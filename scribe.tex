@@ -279,7 +279,7 @@ monotone, in general\cite{KG14}.
 \begin{figure}[h]
   \centering
   \includegraphics[scale=0.8]{cond_ind.png}
-  \caption{An directed graphical model where the elemets of $S$ are
+  \caption{A directed graphical model where the elemets of $S$ are
     independent conditioned on $U$}
   \label{fig:ugm}
 \end{figure}
@@ -320,11 +320,11 @@ It is well known that maximizing an arbitrary submodular function with
 given constraint set is, in general, NP-Hard. %(REFERENCE?)
 
 \begin{problem}
-Given ground set $S_g$, subset $S \subseteq S_g$, and submodular set function $f(\cdot)$:
+Given ground set $\mathcal{X}$, subset $S \subseteq \mathcal{X}$, and submodular set function $f(\cdot)$:
 
 \begin{equation*}
   \begin{split}
-    \max_{S \, \subseteq \, S_g} &f(S)\\
+    \max_{S \, \subseteq \, \mathcal{X}} &f(S)\\
     \text{subject to } &|S| \leq k
   \end{split}
 \end{equation*}
@@ -349,14 +349,14 @@ Finding the optimal solution may be intractable; however, an approximate solutio
 \SetAlgoLined
 \caption{Greedy Algorithm}
 \SetKw{Kw}{Define}
-\Kw{ground set $S_g$, subset $S \subseteq S_g$, set function $f(\cdot)$, and cardinality constraint $|S| \leq k$  }\;
+\Kw{ground set $\mathcal{X}$, subset $S \subseteq \mathcal{X}$, set function $f(\cdot)$, and cardinality constraint $|S| \leq k$  }\;
 \SetKw{Kw}{Description}
 \Kw{ greedily add to $S$ at iteration $i$ the element with the largest discrete derivative}\;
 \KwResult{$S_{greedy}$ }
  $S_0=\emptyset$\;
  $i=0$\;
  \While{$|S_{i}| \leq k-1$}{
-  $\displaystyle S_{i+1} = S_i \, \cup \, \argmax_{s \in \{S_g \setminus S_i\}} \bigg\{ \Delta_f(s \spvert S_i) \bigg\}$ \;
+  $\displaystyle S_{i+1} = S_i \, \cup \, \argmax_{s \in \{\mathcal{X} \setminus S_i\}} \bigg\{ \Delta_f(s \spvert S_i) \bigg\}$ \;
   $i=i+1$\;
  }
 \SetKw{Kw}{Return}
