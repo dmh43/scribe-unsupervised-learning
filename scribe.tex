@@ -145,7 +145,7 @@
 %**** ARE NEVER READ BY ANYBODY.
 
 
-\subsubsection*{Topics Covered} % Don't be this informal in your notes!
+\subsubsection*{Topics Covered}
 \begin{itemize}
 \item Submodularity
 \item Feature selection (see \cite{KG05-1})
@@ -154,17 +154,18 @@
 
 \section{Definitions}
 
-\subsubsection*{Entropy}
-Given a set, $S$, of discrete random variables, define
-the set function $f_H(S): 2^\mathcal{X} \mapsto \mathbb{R}$
-$$f_H(S) = H(X_S) = - \sum_{x_i \in S} p(x_i)\log p(x_i) $$
-and for differential entropy:
+\subsubsection*{Entropy}Given a set $S$ indexing discrete random
+variables in $\mathcal{X}$, define the set function
+$f_H(S): 2^\mathcal{X} \mapsto \mathbb{R}$
+$$f_H(S) = H(X_S) = - \sum_{x_i \in X_S} p(x_i)\log p(x_i) $$
+and for differential entropy ($S$ instead indexes a set of continuous
+random variables $\mathcal{X}$):
 
 $$f_H(S) = H(X_S) = - \int_{\mathcal{X}_S} p(x)\log p(x)dx $$
 
 \subsubsection*{Mutual Information}
-Given random vectors $Y$ and $X_S$, define the following as the mutual
-information between them $f_I(S):~2^\mathcal{X}~\mapsto~\mathbb{R}$
+Given random vectors $Y$ and $X_S$ where $S$ indexes a subset of the elements in $\mathcal{X}$, define the following as the mutual
+information between $Y$ and $X_S$ as $f_I(S):~2^\mathcal{X}~\mapsto~\mathbb{R}$
 $$f_I(S) = I(Y; X_S) = H(Y) - H(Y | X_S)$$
 
 \section{Properties}
@@ -174,17 +175,17 @@ $f_H$ is submodular.
 \end{lemma}
 
 \begin{proof}
-  Consider subsets $A$ and $B$ of random variables,
-  $\mathcal{X}$, where $A \subseteq B$. Also consider a random
-  variable $X_m \notin A \cup B$
-  $$f_H(X_A , X_{\{m\}}) - f_H(X_A) = H(X_A, X_m) - H(X_A) = H(X_m | X_A)$$
+  Consider subsets $A$ and $B$ indexing random variables in
+  $\mathcal{X}$, where $A \subseteq B$. Also consider another index
+  $m$ of a single random variable $X_m \in \mathcal{X}$ where $m \notin A \cup B$.
+  $$f_H(X_{A \cup \{m\}}) - f_H(X_A) = H(X_{A \cup \{m\}}) - H(X_A) = H(X_m | X_A)$$
   \centering and similarly
-  $$f_H(X_B , X_{\{m\}}) - f_H(X_B) = H(X_m | X_B)$$
+  $$f_H(X_{B \cup \{m\}}) - f_H(X_B) = H(X_m | X_B)$$
   Since conditioning on a larger set of random variables cannot
   increase the entropy:
   \begin{align*}
     H(X_m | X_B) & \leq H(X_m | X_A) \\
-    f_H(X_B , X_{\{m\}}) - f_H(X_B) & \leq f_H(X_A , X_{\{m\}}) - f_H(X_A)
+    f_H(X_{B \cup \{m\}}) - f_H(X_B) & \leq f_H(X_{A \cup \{m\}}) - f_H(X_A)
   \end{align*}
 \end{proof}
 
@@ -320,11 +321,11 @@ It is well known that maximizing an arbitrary submodular function with
 given constraint set is, in general, NP-Hard. %(REFERENCE?)
 
 \begin{problem}
-Given ground set $\mathcal{X}$, subset $S \subseteq \mathcal{X}$, and submodular set function $f(\cdot)$:
+Given ground set $\mathcal{X}$, and index set $S$ where $X_S \subseteq \mathcal{X}$, and submodular set function $f(\cdot)$:
 
 \begin{equation*}
   \begin{split}
-    \max_{S \, \subseteq \, \mathcal{X}} &f(S)\\
+    \max_{S} &f(S)\\
     \text{subject to } &|S| \leq k
   \end{split}
 \end{equation*}
@@ -349,7 +350,7 @@ Finding the optimal solution may be intractable; however, an approximate solutio
 \SetAlgoLined
 \caption{Greedy Algorithm}
 \SetKw{Kw}{Define}
-\Kw{ground set $\mathcal{X}$, subset $S \subseteq \mathcal{X}$, set function $f(\cdot)$, and cardinality constraint $|S| \leq k$  }\;
+\Kw{ground set $\mathcal{X}$, subset $X_S \subseteq \mathcal{X}$, set function $f(\cdot)$, and cardinality constraint $|S| \leq k$  }\;
 \SetKw{Kw}{Description}
 \Kw{ greedily add to $S$ at iteration $i$ the element with the largest discrete derivative}\;
 \KwResult{$S_{greedy}$ }
