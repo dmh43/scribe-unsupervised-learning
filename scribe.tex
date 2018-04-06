@@ -178,14 +178,14 @@ $f_H$ is submodular.
   Consider subsets $A$ and $B$ indexing random variables in
   $\mathcal{X}$, where $A \subseteq B$. Also consider another index
   $m$ of a single random variable $X_m \in \mathcal{X}$ where $m \notin A \cup B$.
-  $$f_H(X_{A \cup \{m\}}) - f_H(X_A) = H(X_{A \cup \{m\}}) - H(X_A) = H(X_m | X_A)$$
+  $$f_H(A \cup \{m\}) - f_H(A) = H(X_{A \cup \{m\}}) - H(X_A) = H(X_m | X_A)$$
   \centering and similarly
-  $$f_H(X_{B \cup \{m\}}) - f_H(X_B) = H(X_m | X_B)$$
+  $$f_H(B \cup \{m\}) - f_H(B) = H(X_m | X_B)$$
   Since conditioning on a larger set of random variables cannot
   increase the entropy:
   \begin{align*}
     H(X_m | X_B) & \leq H(X_m | X_A) \\
-    f_H(X_{B \cup \{m\}}) - f_H(X_B) & \leq f_H(X_{A \cup \{m\}}) - f_H(X_A)
+    f_H(B \cup \{m\}) - f_H(B) & \leq f_H(A \cup \{m\}) - f_H(A)
   \end{align*}
 \end{proof}
 
